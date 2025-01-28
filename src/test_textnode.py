@@ -2,6 +2,7 @@ import unittest
 
 from textnode import TextNode, TextType
 
+from enum import Enum
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):

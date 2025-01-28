@@ -1,4 +1,6 @@
 from textnode import TextNode, TextType
+from enum import Enum
+from htmlnode import HtmlNode
 
 
 def main():
