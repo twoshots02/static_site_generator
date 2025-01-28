@@ -1,3 +1,7 @@
+from enum import Enum
+
+VOID_ELEMENTS = ["img", "br", "hr", "input", "meta", "link"]
+
 
 
 class HTMLNode():
@@ -5,7 +9,7 @@ class HTMLNode():
         self.tag = tag
         self.value = value
         if type(self) is not LeafNode:  # Only set children for non-LeafNodes
-            self.children = children or []
+            self.children = children
         
         self.props = props or {}
     
@@ -35,9 +39,25 @@ class LeafNode(HTMLNode):
         raise AttributeError("Cannot set children on a LeafNode")
     
     def to_html(self):
-        if not self.value:
+        # Then in LeafNode.to_html():
+        if self.value is None and self.tag not in VOID_ELEMENTS:
             raise ValueError("LeafNode must have a value")
         if not self.tag:
             return self.value
-        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+        if self.tag in VOID_ELEMENTS:
+            return f"<{self.tag}{self.props_to_html()}>"
+        else:
+            return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
 
+class ParentNode(HTMLNode):
+    def __init__(self, tag, children, props = None):
+#        if children is None:
+#            raise ValueError("ParentNode must have children")
+        super().__init__(tag, children = children, props = props)
+    
+    def to_html(self):
+        if self.tag is None:
+            raise ValueError("ParentNode must have a tag")
+        if self.children is None:
+            raise ValueError("ParentNode must have children")
+        return f"<{self.tag}{self.props_to_html()}>{''.join([child.to_html() for child in self.children])}</{self.tag}>"
