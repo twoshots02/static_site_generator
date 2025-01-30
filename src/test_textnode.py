@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import *
-
+from inline import *
 from enum import Enum
 
 class TestTextNode(unittest.TestCase):
@@ -102,6 +102,22 @@ class TestTextNode(unittest.TestCase):
         with self.assertRaises(ValueError):
             split_nodes_delimiter([delimiter_node4], "**", TextType.BOLD)
 
-
+    def test_extract_markdown_images(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        images_result = extract_markdown_images(text)
+        self.assertEqual(images_result, [("rick roll",
+                                          "https://i.imgur.com/aKaOqIh.gif"),
+                                          ("obi wan",
+                                           "https://i.imgur.com/fJRm4Vk.jpeg"
+                                        )])
+    def extract_markdown_links(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        links_result = extract_markdown_links(text)
+        self.assertEqual(links_result, 
+                        [("to boot dev",
+                           "https://www.boot.dev"),
+                           ("to youtube",
+                            "https://www.youtube.com/@bootdotdev"
+                        )])
 if __name__ == "__main__":
     unittest.main()
