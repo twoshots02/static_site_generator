@@ -1,13 +1,16 @@
-from textnode import TextNode, TextType
+from textnode import *
 from enum import Enum
-from htmlnode import HtmlNode
+from htmlnode import *
 
 
 def main():
-    text_node = TextNode("This is a text node", TextType.BOLD.value, "https://www.boot.dev")
-    print(f"TextNode({text_node.text}, {text_node.text_type}, {text_node.url})")
-    print(text_node.text)
-    print(text_node.text_type)
-    print(text_node.url)
+#    text_node = TextNode("This is a text node", TextType.BOLD.value, "https://www.boot.dev")
+#    print(f"TextNode({text_node.text}, {text_node.text_type}, {text_node.url})")
+#    print(text_node.text)
+#    print(text_node.text_type)
+#    print(text_node.url)
+    delimiter_node3 = TextNode("** **bold** **", TextType.NORMAL)
+    result3 = split_nodes_delimiter([delimiter_node3], "**", TextType.BOLD)
+    print(f"the results are: {result3}")
 
 main()

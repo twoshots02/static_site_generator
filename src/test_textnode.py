@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType, text_node_to_html_node
+from textnode import *
 
 from enum import Enum
 
@@ -66,6 +66,41 @@ class TestTextNode(unittest.TestCase):
         with self.assertRaises(ValueError):
             html_node7 = text_node_to_html_node("not a text node")
         
+        
+    def test_split_nodes_delimiter(self):
+        delimiter_node = TextNode("This is a **bold** text", TextType.NORMAL)
+        result =  split_nodes_delimiter([delimiter_node], "**", TextType.BOLD)
+        self.assertEqual(result, [
+            TextNode("This is a ", TextType.NORMAL),
+            TextNode("bold", TextType.BOLD),
+            TextNode(" text", TextType.NORMAL)
+        ])
+
+        delimiter_node1 = TextNode("This has no special markup", TextType.NORMAL)
+        result1 = split_nodes_delimiter([delimiter_node1], "**", TextType.BOLD)
+        self.assertEqual(result1, [TextNode("This has no special markup", TextType.NORMAL)])
+
+        delimiter_node2 = TextNode("Start **bold1** and **bold2** end", TextType.NORMAL)
+        result2 = split_nodes_delimiter([delimiter_node2], "**", TextType.BOLD)
+        self.assertEqual(result2, [
+        TextNode("Start ", TextType.NORMAL),
+        TextNode("bold1", TextType.BOLD),
+        TextNode(" and ", TextType.NORMAL),
+        TextNode("bold2", TextType.BOLD),
+        TextNode(" end", TextType.NORMAL)
+        ])
+
+        delimiter_node3 = TextNode("** **bold** **", TextType.NORMAL)
+        result3 = split_nodes_delimiter([delimiter_node3], "**", TextType.BOLD)
+        self.assertEqual(result3, [
+        TextNode(" ", TextType.NORMAL),
+        TextNode("bold", TextType.BOLD),
+        TextNode(" ", TextType.NORMAL)
+        ])
+
+        delimiter_node4 = TextNode("Here is an **unclosed bold", TextType.NORMAL)
+        with self.assertRaises(ValueError):
+            split_nodes_delimiter([delimiter_node4], "**", TextType.BOLD)
 
 
 if __name__ == "__main__":
