@@ -38,12 +38,59 @@ def extract_markdown_images(text):
     #text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
     # [("rick roll", "https://i.imgur.com/aKaOqIh.gif"), ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
     matches = re.findall(r"!\[([^\[\]]*)\]\(([^\[\]]*)\)", text)
-    return(matches)
+    return (matches)
     
     
 
 def extract_markdown_links(text):
     #text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
     # [("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")]
-    matches = re.findall(r"\[([^\[\]]*)\]\(([^\[\]]*)\)", text)
-    print(matches)
+    matches = re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\[\]]*)\)", text)
+    return (matches)
+
+def split_nodes_link(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+        if node.text_type != TextType.NORMAL:
+            new_nodes.append(node)
+            continue
+        links = extract_markdown_links(node.text)
+        if not links:
+            new_nodes.append(node)
+            continue
+        remaining_text = node.text
+        for text, url in links:
+            new_text = remaining_text.split(f"[{text}]({url})", 1)
+            if new_text[0]:
+                new_nodes.append(TextNode(new_text[0], TextType.NORMAL))
+            new_nodes.append(TextNode(text, TextType.LINKS, url))
+            remaining_text = new_text[1] if len(new_text) > 1 else ""
+        if not remaining_text and (len(links) > 1 or new_text[0]):
+            new_nodes.append(TextNode("", TextType.NORMAL))
+        if remaining_text:
+            new_nodes.append(TextNode(remaining_text, TextType.NORMAL))
+    return new_nodes
+   
+
+def split_nodes_image(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+        if node.text_type != TextType.NORMAL:
+            new_nodes.append(node)
+            continue
+        images = extract_markdown_images(node.text)
+        if not images:
+            new_nodes.append(node)
+            continue
+        remaining_text = node.text
+        for text, url in images:
+            new_text = remaining_text.split(f"![{text}]({url})", 1)
+            if new_text[0] :
+                new_nodes.append(TextNode(new_text[0], TextType.NORMAL))
+            new_nodes.append(TextNode(text, TextType.IMAGES, url))
+            remaining_text = new_text[1] if len(new_text) > 1 else ""
+            if remaining_text == "" and new_text[0]: new_nodes.append(TextNode("", TextType.NORMAL))
+        if remaining_text:
+            new_nodes.append(TextNode(remaining_text, TextType.NORMAL))
+    return new_nodes
+    
