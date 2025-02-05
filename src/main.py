@@ -2,6 +2,7 @@ from textnode import *
 from enum import Enum
 from htmlnode import *
 from inline import *
+from splitblocks import *
 
 
 def main():
@@ -30,10 +31,12 @@ def main():
    # for n in result:
    #     print(f"Text: '{n.text}', Type: {n.text_type}, URL: {n.url}")    
 
-    node = TextNode("Start [first link](https://example.com) middle [second link](https://boot.dev) end", TextType.NORMAL)
-    result = split_nodes_link([node])
-    print("\nTest multiple links:")
-    print("Input:", node.text)
-    for n in result:
-        print(f"Text: '{n.text}', Type: {n.text_type}, URL: {n.url}")
+# Test ordered list
+    print(block_to_block_type("1. First\n2. Second\n3. Third"))
+
+# Test quote
+    print(block_to_block_type(">Line one\n>Line two"))
+
+# Test code
+    print(block_to_block_type("```\nsome code\nmore code\n```"))
 main()
