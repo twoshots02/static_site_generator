@@ -7,7 +7,7 @@ from enum import Enum
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
     for node in old_nodes:
-        if node.text_type != TextType.NORMAL:
+        if node.text_type != TextType.TEXT:
             new_nodes.append(node)
             continue
 
@@ -26,8 +26,8 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             if part == "" and (i == 0 or i == len(parts)-1):
                 continue
             if i % 2 == 0:
-            #    print(f"Index: {i} Adding NORMAL TextNode with: {part}")
-                new_nodes.append(TextNode(part, TextType.NORMAL))
+            #    print(f"Index: {i} Adding TEXT TextNode with: {part}")
+                new_nodes.append(TextNode(part, TextType.TEXT))
             else:
             #    print(f"Index: {i} Adding {text_type} TextNode with: {part}")
                 new_nodes.append(TextNode(part, text_type))
@@ -51,7 +51,7 @@ def extract_markdown_links(text):
 def split_nodes_link(old_nodes):
     new_nodes = []
     for node in old_nodes:
-        if node.text_type != TextType.NORMAL:
+        if node.text_type != TextType.TEXT:
             new_nodes.append(node)
             continue
         links = extract_markdown_links(node.text)
@@ -62,20 +62,20 @@ def split_nodes_link(old_nodes):
         for text, url in links:
             new_text = remaining_text.split(f"[{text}]({url})", 1)
             if new_text[0]:
-                new_nodes.append(TextNode(new_text[0], TextType.NORMAL))
-            new_nodes.append(TextNode(text, TextType.LINKS, url))
+                new_nodes.append(TextNode(new_text[0], TextType.TEXT))
+            new_nodes.append(TextNode(text, TextType.LINK, url))
             remaining_text = new_text[1] if len(new_text) > 1 else ""
         if not remaining_text and (len(links) > 1 or new_text[0]):
-            new_nodes.append(TextNode("", TextType.NORMAL))
+            new_nodes.append(TextNode("", TextType.TEXT))
         if remaining_text:
-            new_nodes.append(TextNode(remaining_text, TextType.NORMAL))
+            new_nodes.append(TextNode(remaining_text, TextType.TEXT))
     return new_nodes
    
 
 def split_nodes_image(old_nodes):
     new_nodes = []
     for node in old_nodes:
-        if node.text_type != TextType.NORMAL:
+        if node.text_type != TextType.TEXT:
             new_nodes.append(node)
             continue
         images = extract_markdown_images(node.text)
@@ -86,11 +86,20 @@ def split_nodes_image(old_nodes):
         for text, url in images:
             new_text = remaining_text.split(f"![{text}]({url})", 1)
             if new_text[0] :
-                new_nodes.append(TextNode(new_text[0], TextType.NORMAL))
-            new_nodes.append(TextNode(text, TextType.IMAGES, url))
+                new_nodes.append(TextNode(new_text[0], TextType.TEXT))
+            new_nodes.append(TextNode(text, TextType.IMAGE, url))
             remaining_text = new_text[1] if len(new_text) > 1 else ""
-            if remaining_text == "" and new_text[0]: new_nodes.append(TextNode("", TextType.NORMAL))
+            if remaining_text == "" and new_text[0]: new_nodes.append(TextNode("", TextType.TEXT))
         if remaining_text:
-            new_nodes.append(TextNode(remaining_text, TextType.NORMAL))
+            new_nodes.append(TextNode(remaining_text, TextType.TEXT))
     return new_nodes
-    
+
+def text_to_textnodes(text):
+    new_nodes = []
+    new_nodes.append(TextNode(text, TextType.TEXT))
+    new_nodes = split_nodes_link(new_nodes)
+    new_nodes = split_nodes_image(new_nodes)
+    new_nodes = split_nodes_delimiter(new_nodes, "**", text_type=TextType.BOLD)
+    new_nodes = split_nodes_delimiter(new_nodes, "*", text_type=TextType.ITALIC)
+    new_nodes = split_nodes_delimiter(new_nodes, "`", text_type=TextType.CODE)
+    return new_nodes
