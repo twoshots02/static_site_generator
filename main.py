@@ -1,8 +1,8 @@
-from textnode import *
+from src import *
 from enum import Enum
-from htmlnode import *
-from inline import *
-from splitblocks import *
+#from htmlnode import *
+#from inline import *
+#from splitblocks import *
 import os
 import shutil
 import logging
