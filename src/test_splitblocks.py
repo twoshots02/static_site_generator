@@ -71,6 +71,53 @@ class TestSplitBlock(unittest.TestCase):
         ]
         for index, test_string in enumerate(test_strings):
             self.assertEqual(block_to_block_type(test_string), expected_types[index])
-
+    
+    def test_markdown_to_html_node(self):
+        # Test paragraph
+        markdown = "This is a paragraph"
+        expected = "<div><p>This is a paragraph</p></div>"
+        self.assertEqual(
+            markdown_to_html_node(markdown).to_html(),
+            expected
+        )
+        
+        # Test heading
+        markdown = "# Header"
+        expected = "<div><h1>Header</h1></div>"
+        self.assertEqual(
+            markdown_to_html_node(markdown).to_html(),
+            expected
+        )
+        
+        # Test multiple block types
+        markdown = "# Header\n\nParagraph\n\n> Quote"
+        expected = "<div><h1>Header</h1><p>Paragraph</p><blockquote>Quote</blockquote></div>"
+        self.assertEqual(
+            markdown_to_html_node(markdown).to_html(),
+            expected
+        )
+        
+        # Test lists
+        markdown = "* Item 1\n* Item 2"
+        expected = "<div><ul><li>Item 1</li><li>Item 2</li></ul></div>"
+        self.assertEqual(
+            markdown_to_html_node(markdown).to_html(),
+            expected
+        )
+        
+        markdown = "1. Item 1\n2. Item 2"
+        expected = "<div><ol><li>Item 1</li><li>Item 2</li></ol></div>"
+        self.assertEqual(
+            markdown_to_html_node(markdown).to_html(),
+            expected
+        )
+        
+        # Test code block
+        markdown = "```\ncode block\n```"
+        expected = "<div><pre><code>code block</code></pre></div>"
+        self.assertEqual(
+            markdown_to_html_node(markdown).to_html(),
+            expected
+        )
 if __name__ == "__main__":
     unittest.main()

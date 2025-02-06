@@ -32,11 +32,13 @@ def main():
    #     print(f"Text: '{n.text}', Type: {n.text_type}, URL: {n.url}")    
 
 # Test ordered list
-    print(block_to_block_type("1. First\n2. Second\n3. Third"))
+    #print(block_to_block_type("1. First\n2. Second\n3. Third"))
 
 # Test quote
-    print(block_to_block_type(">Line one\n>Line two"))
+   # print(block_to_block_type(">Line one\n>Line two"))
 
 # Test code
-    print(block_to_block_type("```\nsome code\nmore code\n```"))
+   print(block_to_block_type("```\nsome code\nmore code\n```"))
+
+   
 main()
