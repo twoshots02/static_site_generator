@@ -1,70 +1,40 @@
-
 from enum import Enum
 from htmlnode import *
 from inline import *
 from splitblocks import *
-import os
-import shutil
-import logging
 from website import *
+from pathlib import Path
+from shutil import rmtree
+import logging
 import sys
 
 # Configure logging to show the time, log level, and message.
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(message)s'
 )
 
-def clear_destination(dest):
-    """
-    Deletes the destination directory if it exists and then recreates it,
-    ensuring a clean copy.
-    """
-    if os.path.exists(dest):
-        logging.info(f"Clearing destination directory: {dest}")
-        shutil.rmtree(dest)
-    os.makedirs(dest)
-    logging.info(f"Created clean destination directory: {dest}")
-
-def copy_recursive(src, dest):
-    """
-    Recursively copies contents from src to dest.
-    Logs the path of each directory created and file copied.
-    """
-    if os.path.isdir(src):
-        # Ensure the destination directory exists.
-        if not os.path.exists(dest):
-            os.makedirs(dest)
-            logging.info(f"Created directory: {dest}")
-        # Recursively copy each item in the directory.
-        for item in os.listdir(src):
-            src_item = os.path.join(src, item)
-            dest_item = os.path.join(dest, item)
-            copy_recursive(src_item, dest_item)
-    else:
-        # Copy file and preserve metadata.
-        shutil.copy2(src, dest)
-        logging.info(f"Copied file: {src} -> {dest}")
-
 if __name__ == '__main__':
-    source_dir = './static'
-    dest_dir = './public'
-    content_file = './content'
-    template_file = './template.html'
-    template_path = './'
-    dest_file = os.path.join(dest_dir, 'index.html')
-    # Clear destination directory to start with a clean slate.
-    clear_destination(dest_dir)
-    if not os.path.exists(content_file):
-        logging.error(f"Content file not found: {content_file}")
-        sys.exit(1)
-    if not os.path.exists(template_path):
-        logging.error(f"Template file not found: {template_file}")
-        sys.exit(1)
-    if not os.path.exists(source_dir):
+    source_dir = Path('./content')       # This is your markdown source directory
+    dest_dir = Path('./public')          # This is where your HTML files will be generated
+    template_file = Path('./template.html') # Path to your HTML template
+
+    # Clear destination directory
+    if dest_dir.exists():
+        logging.info(f"Clearing destination directory: {dest_dir}")
+        rmtree(dest_dir)
+    dest_dir.mkdir(parents=True, exist_ok=True)
+
+    # Check for required files and directories
+    if not source_dir.exists():
         logging.error(f"Source directory not found: {source_dir}")
-        sys.exit(1)
-    # Recursively copy contents from source to destination.
-    copy_recursive(source_dir, dest_dir)
-    logging.info(f"Generating page with content: {content_file}, template: {template_path}, destination: {dest_file}")
-    generate_page(content_file, template_path, dest_file)
+        sys.exit(1)  # Exit with error code if source directory is missing
+    if not template_file.exists():
+        logging.error(f"Template file not found: {template_file}")
+        sys.exit(1)  # Exit with error code if template file is missing
+
+    # Generate pages recursively using content and template
+    logging.info(f"Generating pages with content: {source_dir}, template: {template_file}, destination: {dest_dir}")
+    generate_pages_recursive(source_dir, template_file, dest_dir)
+
+    logging.info("Page generation completed successfully.")
