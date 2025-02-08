@@ -119,5 +119,32 @@ class TestSplitBlock(unittest.TestCase):
             markdown_to_html_node(markdown).to_html(),
             expected
         )
+
+    def test_bold_transformation(self):
+        markdown_input = "**I like Tolkien**"
+        expected_output = "<b>I like Tolkien</b>"
+        # Assuming markdown_to_html_node(markdown).to_html()
+        # is the process that converts markdown to HTML
+        html_node = markdown_to_html_node(markdown_input)
+        actual_output = html_node.to_html()
+        self.assertEqual(actual_output.strip(), expected_output)
+
+    def test_link_parsing(self):
+        # Given: A markdown string containing a link
+        markdown_input = "[first post here](/majesty) (sorry the link doesn't work yet)"
+        
+        
+        # Expected: Correctly parsed HTML output for the link
+        expected_html_output = '<a href="/majesty">first post here</a> (sorry the link doesn\'t work yet)'
+        
+        # When: Calling the markdown_to_html_node and converting to HTML
+        # Assuming you have a parsing function similar to this in your code
+        html_node = markdown_to_html_node(markdown_input)  # Replace with your function
+        actual_html_output = html_node.to_html()          # Convert node to HTML string
+        
+        # Then: The actual HTML should match the expected output
+        self.assertEqual(actual_html_output, expected_html_output)
+
+
 if __name__ == "__main__":
     unittest.main()

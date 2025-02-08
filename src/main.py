@@ -1,11 +1,13 @@
-from src import *
+
 from enum import Enum
-#from htmlnode import *
-#from inline import *
-#from splitblocks import *
+from htmlnode import *
+from inline import *
+from splitblocks import *
 import os
 import shutil
 import logging
+from website import *
+import sys
 
 # Configure logging to show the time, log level, and message.
 logging.basicConfig(
@@ -47,9 +49,22 @@ def copy_recursive(src, dest):
 if __name__ == '__main__':
     source_dir = './static'
     dest_dir = './public'
-    
+    content_file = './content'
+    template_file = './template.html'
+    template_path = './'
+    dest_file = os.path.join(dest_dir, 'index.html')
     # Clear destination directory to start with a clean slate.
     clear_destination(dest_dir)
-    
+    if not os.path.exists(content_file):
+        logging.error(f"Content file not found: {content_file}")
+        sys.exit(1)
+    if not os.path.exists(template_path):
+        logging.error(f"Template file not found: {template_file}")
+        sys.exit(1)
+    if not os.path.exists(source_dir):
+        logging.error(f"Source directory not found: {source_dir}")
+        sys.exit(1)
     # Recursively copy contents from source to destination.
     copy_recursive(source_dir, dest_dir)
+    logging.info(f"Generating page with content: {content_file}, template: {template_path}, destination: {dest_file}")
+    generate_page(content_file, template_path, dest_file)
